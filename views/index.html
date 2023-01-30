@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Eve Market Reader</title>
+    </head>
+    
+    <body>
+    </body>
+    <script>
+        document.addEventListener("DOMContentLoaded", ()=>{
+            var button = document.createElement("button");
+            button.textContent ="Auth";
+            document.body.appendChild(button);
+            button.addEventListener("click",()=>{
+                window.location.href='http://localhost:3000/auth/'
+            });
+        })
+    </script>
+</html>
