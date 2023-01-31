@@ -15,16 +15,6 @@ app.use(cookieParser())
 app.set('views', path.join(__dirname, "views"));
 app.set('view engine','ejs');
 
-const connection = mysql.createConnection({
-    host:'localhost',
-    user:'mysql',
-    password:'password',
-    database:'evemarketreader'
-})
-
-connection.connect((err)=>{if (err) throw err; console.log('MySQL server connected.');})
-
-
 app.get('/', (req, res) => {res.sendFile(path.join(__dirname, '/views/index.html'))});
 const authRouter = require('./routes/auth')
 app.use('/auth', authRouter)
@@ -32,7 +22,11 @@ const callbackRouter = require('./routes/callback')
 app.use('/callback', callbackRouter)
 const homeRouter = require('./routes/home')
 app.use('/home', homeRouter)
-const sdeRouter = require('./routes/sde')
+const sdeRouter = require('./routes/sde');
+const { response } = require('express');
 app.use('/sde', sdeRouter)
 
 app.listen(3000);
+
+
+
