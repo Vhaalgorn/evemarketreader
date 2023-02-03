@@ -9,31 +9,55 @@ const connection = mysql.createConnection({
     database:'evemarketreader'
 })
 
-function queryFunction(err, response)
-{
-    if (err) throw err;
-}
-
 var searchString = '11394' //at this point the typeID will always be a blueprint_typeID
-var query =
-`
-    SELECT typeID, groupID, typeName
-    FROM invTypes
-    WHERE invTypes.typeID = ${searchString}
-`
+
 connection.connect((err)=>
 {
     if (err) throw err;
     console.log('MySQL server connected.');
 })
-
-router.get('/',(req, res)=>
+async function get_blueprintTypeID(blueprint_typeID)
 {
-    connection.query(query,(err, result)=>
+    let result = await new Promise((resolve, reject)=>
     {
-        if (err) throw err;
-        console.log(result)
-        res.send(result)
+        
+        connection.query(`SELECT typeID as blueprint_typeID FROM industryActivityProducts WHERE productTypeID=${blueprint_typeID}`, (err,result)=>
+        {
+            if (err) reject(err)
+            else
+            {
+                if(result[0] === undefined){
+                    resolve('material') 
+                }
+                else resolve(result[0].blueprint_typeID); 
+            }
+        })
+        
     })
+    return result;
+}
+
+async function get_material_TypeID(blueprint_typeID)
+{
+    let result = await new Promise((resolve,reject)=>
+    {
+        connection.query(`SELECT * FROM industryActivityMaterials WHERE typeID=${blueprint_typeID} and activityID=1`, (err,result)=>
+        {
+            if (err) reject(err)
+            else{resolve(result)}
+        })
+    })
+    for (material in result)
+    {
+        result[material].blueprint = await get_blueprintTypeID(Number(result[material].materialTypeID))
+    }
+    return result;
+}
+
+router.get('/',async (req, res)=>
+{
+    let result = await get_material_TypeID(searchString)
+    //let result = await get_blueprintTypeID(11399)
+    res.send(result)
 })
 module.exports = router
